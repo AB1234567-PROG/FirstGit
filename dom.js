@@ -29,9 +29,13 @@
 // header.style.borderBottom = 'solid 3px #000';
 
 //GETELEMENTBYCLASSNAME // 
-var add = document.getElementsByClassName('title');
-console.log(add[0]);
-add[0].style.fontWeight = 'bold';
-add[0].style.color = 'green';
+// var add = document.getElementsByClassName('title');
+// console.log(add[0]);
+// add[0].style.fontWeight = 'bold';
+// add[0].style.color = 'green';
+
+//GETELEMENTSBYCLASSNAME//
+var items = document.getElementsByClassName('list-group-item');
+console.log(items);
 
 
