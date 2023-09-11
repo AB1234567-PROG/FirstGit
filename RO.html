@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Restaurant Order</title>
+  </head>
+
+  <body>
+    <h1>Restaurant Order</h1>
+    <form onsubmit="saveToAxios(event)">
+      <label>Choose Price</label>
+      <input type="number" id="bill" name="amount" />
+      <label>Choose Dish</label>
+      <input type="text" id="description" name="description" />
+      <label for="table"></label>
+      <select name="table" id="table">
+        <option value="table1">Table 1</option>
+        <option value="table2">Table 2</option>
+        <option value="table3">Table 3</option>
+      </select>
+      <button>Add To Bill</button>
+    </form>
+    <h2>Table1</h2>
+    <br />
+    <ul id="list1"></ul>
+    <h2>Table2</h2>
+    <br />
+    <ul id="list2"></ul>
+    <h2>Table3</h2>
+    <br />
+    <ul id="list3"></ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.6/axios.min.js"></script>
+    <script>
+      async function saveToAxios(event) {
+        event.preventDefault();
+        const billAmount = event.target.amount.value;
+        const description = event.target.description.value;
+        const table = event.target.table.value;
+
+        let bill = {
+          billAmount,
+          description,
+          table,
+        };
+
+        try {
+          const respone = await axios.post(
+            "https://crudcrud.com/api/dd271a85ad2247b694f36dcfc7e30e93/billdata",
+            bill
+          );
+          addItemList(respone.data);
+        } catch (err) {
+          document.body.innerHTML =
+            document.body.innerHTML + "<h2> Something went wrong </h2>";
+          console.log(err);
+        }
+      }
+
+      async function fetchBill() {
+        try {
+          const response = await axios.get(
+            "https://crudcrud.com/api/dd271a85ad2247b694f36dcfc7e30e93/billdata"
+          );
+          console.log(response);
+          for (let i = 0; i < response.data.length; i++) {
+            addItemList(response.data[i]);
+          }
+        } catch (error) {
+          document.body.innerHTML += "<h2> Error Loading content .....</h2>";
+          console.log(error);
+        }
+      }
+
+      window.addEventListener("DOMContentLoaded", fetchBill);
+
+      function addItemList(bill) {
+        const parentNode1 = document.getElementById("list1");
+        const parentNode2 = document.getElementById("list2");
+        const parentNode3 = document.getElementById("list3");
+        const childHTML = `<li id=${bill._id}> ${bill.billAmount}-${bill.description}-${bill.table}
+                    <button onclick=deleteBill('${bill._id}','${bill.table}')>Delete</button>`;
+
+        if (bill.table == "table1") {
+          parentNode1.innerHTML = parentNode1.innerHTML + childHTML;
+        } else if (bill.table == "table2") {
+          parentNode2.innerHTML = parentNode2.innerHTML + childHTML;
+        } else {
+          parentNode3.innerHTML = parentNode3.innerHTML + childHTML;
+        }
+      }
+      function deleteBill(billId, table) {
+        console.log(`${billId} will be deleted`);
+        axios
+          .delete(
+            `https://crudcrud.com/api/dd271a85ad2247b694f36dcfc7e30e93/billData/${billId}`
+          )
+          .then(async (response) => {
+            await removebillFromScreen(billId, table);
+          })
+          .catch((err) => {
+            console.log(err);
+            document.body.innerHTML =
+              document.body.innerHTML + "<h2>Error deleteing the bill <h2> ";
+          });
+      }
+
+      async function removebillFromScreen(billId, table) {
+        const parentNode1 = document.getElementById("list1");
+        const parentNode2 = document.getElementById("list2");
+        const parentNode3 = document.getElementById("list3");
+        const childNodeToBeDeleted = document.getElementById(billId);
+
+        if (table == "table1") {
+          parentNode1.removeChild(childNodeToBeDeleted);
+        } else if (table == "table2") {
+          parentNode2.removeChild(childNodeToBeDeleted);
+        } else {
+          parentNode3.removeChild(childNodeToBeDeleted);
+        }
+
+        console.log(`Bill ${billId} is deleted successfully`);
+      }
+    </script>
+  </body>
+</html>
